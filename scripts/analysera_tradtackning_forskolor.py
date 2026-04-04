@@ -73,8 +73,9 @@ Det betyder:
 KÖRNING
 ================================================================================
 
-1. Anpassa filvägarna i PARAMETRAR nedan om det behövs.
-2. Kör skriptet:
+1. Säkerställ att beroenden redan finns installerade i miljön.
+2. Anpassa filvägarna i PARAMETRAR nedan om det behövs.
+3. Kör skriptet:
 
    python analysera_tradtackning_forskolor.py
 
@@ -82,68 +83,91 @@ KÖRNING
 """
 
 # ==============================================================================
-# 1. AUTOMATISK INSTALLATION AV BIBLIOTEK
+# 1. BERoENDEKONTROLL - CODEX WEB COMPLIANT
 # ==============================================================================
 #
-# Användarens krav är att skriptet ska kunna installera alla bibliotek som saknas
-# automatiskt. Därför kommer vi först att:
-# - kontrollera vilka bibliotek som behövs
-# - installera dem om de saknas
+# Detta skript försöker INTE installera paket automatiskt.
 #
-# Detta gör skriptet mer självbärande och lättare att köra direkt i en ny miljö.
+# Skäl:
+# - Låsta miljöer som Codex web tillåter ofta inte "pip install" under körning.
+# - Automatisk installation kan ge 403 Forbidden, proxyfel eller andra nätverksfel.
+# - Ett robust skript ska därför kontrollera beroenden och ge tydligt fel om något
+#   saknas, men inte försöka ändra miljön självt.
+#
+# Detta är medvetet och korrekt för Codex web.
 # ==============================================================================
 
 import sys
-import subprocess
 import importlib
+from pathlib import Path
 
 
-def ensure_package(import_name: str, pip_name: str = None) -> None:
+REQUIRED_PACKAGES = [
+    ("numpy", "numpy"),
+    ("pandas", "pandas"),
+    ("fiona", "fiona"),
+    ("rasterio", "rasterio"),
+    ("pyproj", "pyproj"),
+    ("shapely", "shapely"),
+    ("folium", "folium"),
+    ("PIL", "Pillow"),
+]
+
+
+def check_required_packages() -> None:
     """
-    Säkerställ att ett paket finns installerat.
+    Kontrollera att alla nödvändiga paket finns installerade.
 
-    Parametrar
-    ----------
-    import_name : str
-        Namnet som används i Python-import, t.ex. 'rasterio'.
+    Viktigt:
+    --------
+    Denna funktion installerar INTE paket. Den gör endast en passiv kontroll.
 
-    pip_name : str
-        Namnet som används vid pip-installation. Om None används samma namn som
-        import_name.
-
-    Varför denna funktion finns
-    ---------------------------
-    För att skriptet ska vara direkt körbart även i miljöer där vissa bibliotek
-    ännu inte är installerade.
+    Om något paket saknas avslutas skriptet med ett tydligt felmeddelande.
+    Detta är avsiktligt för att fungera i låsta körmiljöer, t.ex. Codex web.
     """
-    if pip_name is None:
-        pip_name = import_name
+    missing = []
 
-    try:
-        importlib.import_module(import_name)
-    except ImportError:
-        print(f"[INFO] Installerar saknat paket: {pip_name}")
-        subprocess.check_call([sys.executable, "-m", "pip", "install", pip_name])
+    for import_name, pip_name in REQUIRED_PACKAGES:
+        try:
+            importlib.import_module(import_name)
+        except ImportError:
+            missing.append((import_name, pip_name))
+
+    if missing:
+        lines = [
+            "",
+            "=" * 80,
+            "SAKNADE PYTHON-PAKET",
+            "=" * 80,
+            "Följande paket saknas i körmiljön:",
+            "",
+        ]
+        for import_name, pip_name in missing:
+            lines.append(f"- import '{import_name}'  -> paket '{pip_name}'")
+
+        lines.extend(
+            [
+                "",
+                "Detta skript försöker inte installera paket automatiskt.",
+                "Det är avsiktligt för att vara kompatibelt med låsta miljöer som",
+                "Codex web, där pip-installation under körning ofta är blockerad.",
+                "",
+                "Installera paketen i förväg i den miljö där skriptet ska köras.",
+                "=" * 80,
+                "",
+            ]
+        )
+        raise SystemExit("\n".join(lines))
 
 
-# Paket som behövs i detta skript
-ensure_package("numpy")
-ensure_package("pandas")
-ensure_package("fiona")
-ensure_package("rasterio")
-ensure_package("pyproj")
-ensure_package("shapely")
-ensure_package("folium")
-ensure_package("PIL", "Pillow")
+check_required_packages()
 
 # ==============================================================================
 # 2. IMPORTER
 # ==============================================================================
 
-import math
 import base64
 from io import BytesIO
-from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -287,7 +311,9 @@ def format_pct(value: float) -> str:
     """
     Formatera procenttal med svensk decimalvisning.
     """
-    return str(round(value, 2)).replace(".", ",")
+    if pd.isna(value):
+        return ""
+    return str(round(float(value), 2)).replace(".", ",")
 
 
 # ==============================================================================
@@ -598,7 +624,12 @@ def raster_to_transparent_png_data_url(raster_4326: np.ndarray) -> str:
 # ==============================================================================
 
 
-def create_map(df: pd.DataFrame, raster_overlay_data_url: str, raster_4326: np.ndarray, raster_transform_4326):
+def create_map(
+    df: pd.DataFrame,
+    raster_overlay_data_url: str,
+    raster_4326: np.ndarray,
+    raster_transform_4326,
+):
     """
     Skapa den interaktiva kartan.
 
@@ -685,10 +716,10 @@ def create_map(df: pd.DataFrame, raster_overlay_data_url: str, raster_4326: np.n
     bottom5 = df_sorted.tail(5)[["namn", "tradtackning_100m_procent"]].values.tolist()
 
     top_html = "<br>".join(
-        [f"{i+1}. {name} – {format_pct(value)} %" for i, (name, value) in enumerate(top5)]
+        [f"{i + 1}. {name} – {format_pct(value)} %" for i, (name, value) in enumerate(top5)]
     )
     bottom_html = "<br>".join(
-        [f"{i+1}. {name} – {format_pct(value)} %" for i, (name, value) in enumerate(bottom5)]
+        [f"{i + 1}. {name} – {format_pct(value)} %" for i, (name, value) in enumerate(bottom5)]
     )
 
     title_html = """
@@ -806,17 +837,18 @@ def main():
 
     Arbetsgång
     ----------
-    1. Kontrollera indata
-    2. Skapa utdatakatalog
-    3. Läs raster
-    4. Läs förskolor
-    5. Beräkna zonstatistik
-    6. Spara CSV
-    7. Reprojicera hela rastret till webbkartan
-    8. Skapa rasteroverlay
-    9. Bygg interaktiv karta
-    10. Spara HTML
-    11. Skriv sammanfattning i terminalen
+    1. Kontrollera beroenden
+    2. Kontrollera indata
+    3. Skapa utdatakatalog
+    4. Läs raster
+    5. Läs förskolor
+    6. Beräkna zonstatistik
+    7. Spara CSV
+    8. Reprojicera hela rastret till webbkartan
+    9. Skapa rasteroverlay
+    10. Bygg interaktiv karta
+    11. Spara HTML
+    12. Skriv sammanfattning i terminalen
     """
     print("[INFO] Startar analys av trädtäckning kring förskolor...")
 
@@ -858,4 +890,9 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        raise SystemExit("\n[AVBRUTET] Körningen avbröts av användaren.")
+    except Exception as exc:
+        raise SystemExit(f"\n[FEL] {exc}")
