@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_2bfe5a14219e2134933f9f84ba95a95f {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+    
+            
+                <style>
+                    .leaflet-image-layer {
+                        /* old android/safari*/
+                        image-rendering: -webkit-optimize-contrast;
+                        image-rendering: crisp-edges; /* safari */
+                        image-rendering: pixelated; /* chrome */
+                        image-rendering: -moz-crisp-edges; /* firefox */
+                        image-rendering: -o-crisp-edges; /* opera */
+                        -ms-interpolation-mode: nearest-neighbor; /* ie */
+                    }
+                </style>
+            
+        
+</head>
+<body>
+    
+    
+    <div style="
+        position: fixed;
+        top: 10px; left: 50px; z-index: 1000;
+        background: white; padding: 10px 12px; border: 1px solid #bbb;
+        border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+        font-family: Arial, sans-serif; font-size: 14px;">
+        <div style="font-weight: 700; margin-bottom: 4px;">Förskolor och trädtäckning</div>
+        <div>Luleå • punktkarta • färg = trädtäckning inom 100 m</div>
+    </div>
+    
+    
+    <div style="
+        position: fixed;
+        bottom: 25px; left: 10px; z-index: 1000;
+        background: white; padding: 10px 12px; border: 1px solid #bbb;
+        border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+        font-family: Arial, sans-serif; font-size: 12px; line-height: 1.4;">
+        <div style="font-weight: 700; margin-bottom: 6px;">Punktfärg = trädtäckning inom 100 m</div>
+        <div><span style="display:inline-block;width:14px;height:14px;background:#006d2c;border:1px solid #666;margin-right:6px;"></span> ≥ 50 %</div>
+        <div><span style="display:inline-block;width:14px;height:14px;background:#31a354;border:1px solid #666;margin-right:6px;"></span> 35–49,9 %</div>
+        <div><span style="display:inline-block;width:14px;height:14px;background:#74c476;border:1px solid #666;margin-right:6px;"></span> 20–34,9 %</div>
+        <div><span style="display:inline-block;width:14px;height:14px;background:#bae4b3;border:1px solid #666;margin-right:6px;"></span> 10–19,9 %</div>
+        <div><span style="display:inline-block;width:14px;height:14px;background:#edf8e9;border:1px solid #666;margin-right:6px;"></span> &lt; 10 %</div>
+        <div style="margin-top: 8px; color: #444;">Popup visar 25 m, 50 m och 100 m</div>
+    </div>
+    
+    
+    <div style="
+        position: fixed;
+        bottom: 25px; right: 10px; z-index: 1000;
+        background: white; padding: 10px 12px; border: 1px solid #bbb;
+        border-radius: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+        font-family: Arial, sans-serif; font-size: 12px; line-height: 1.35; max-width: 340px;">
+        <div style="font-weight: 700; margin-bottom: 4px;">Högst trädtäckning inom 100 m</div>
+        <div>1. BERGSPRÄNGARENS FÖRSKOLA – 39,14 %<br>2. DUNGENS FÖRSKOLA – 36,77 %<br>3. ÅRANS FÖRSKOLA – 36,41 %<br>4. HAGA FÖRSKOLA – 34,5 %<br>5. SNÖMANNENS FÖRSKOLA – 31,02 %</div>
+        <div style="font-weight: 700; margin: 8px 0 4px;">Lägst trädtäckning inom 100 m</div>
+        <div>1. KLIPPANS FÖRSKOLA – 0,0 %<br>2. STENÅSENS FÖRSKOLA – 0,0 %<br>3. Trollnäs förskola ek. för. – 0,0 %<br>4. VÅGENS förskola Ekonomisk förening – 0,0 %<br>5. Vågens Förskola AB – 0,0 %</div>
+    </div>
+    
+    
+            <div class="folium-map" id="map_2bfe5a14219e2134933f9f84ba95a95f" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_2bfe5a14219e2134933f9f84ba95a95f = L.map(
+                "map_2bfe5a14219e2134933f9f84ba95a95f",
+                {
+                    center: [65.58788837835823, 22.190712713557666],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 12,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+            L.control.scale().addTo(map_2bfe5a14219e2134933f9f84ba95a95f);
+
+            
+
+        
+    
+            var tile_layer_fcb2f44c27fb76fbe8e99a9000e0934b = L.tileLayer(
+                "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 20,
+  "maxNativeZoom": 20,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors \u0026copy; \u003ca href=\"https://carto.com/attributions\"\u003eCARTO\u003c/a\u003e",
+  "subdomains": "abcd",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_fcb2f44c27fb76fbe8e99a9000e0934b.addTo(map_2bfe5a14219e2134933f9f84ba95a95f);
+        
+    
+            var image_overlay_7b4410310ea6066a19889a099ae5c355 = L.imageOverlay(
+                "data:image/png;base64,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",
+                [[65.54370333238597, 22.054966339128114], [65.63207342433049, 22.326459087987217]],
+                {
+  "opacity": 0.62,
+}
+            );
+        
+    
+            image_overlay_7b4410310ea6066a19889a099ae5c355.addTo(map_2bfe5a14219e2134933f9f84ba95a95f);
+        
+    
+            var feature_group_2d7b6c31042a2d07da3263cdc5e360f9 = L.featureGroup(
+                {
+}
+            );
+        
+    
+            var circle_marker_6a3ae38bdf91def8d36385d82610ba4b = L.circleMarker(
+                [65.584954, 22.192916],
+                {"bubblingMouseEvents": true, "color": "#404040", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#31a354", "fillOpacity": 0.92, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_2d7b6c31042a2d07da3263cdc5e360f9);
+        
+    
+        var popup_59b1966acb17ff94f8a02b8ce5ebc412 = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_b85d61637fd4207664e280ba7b49a01a = $(`<div id="html_b85d61637fd4207664e280ba7b49a01a" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; line-height: 1.45; min-width: 250px;">             <div style="font-weight: 700; margin-bottom: 4px;">BERGSPRÄNGARENS FÖRSKOLA</div>             <div>SPRÄNGGATAN 2</div>             <div>97432 LULEÅ</div>             <div style="margin: 8px 0 4px; font-weight: 700;">Trädtäckning</div>             <div>25 m: 0,61 %</div>             <div>50 m: 21,69 %</div>             <div>100 m: 39,14 %</div>             <div style="margin-top: 6px;">Index 25/50/100: 14,64</div>         </div>         </div>`)[0];
+                popup_59b1966acb17ff94f8a02b8ce5ebc412.setContent(html_b85d61637fd4207664e280ba7b49a01a);
+            
+        
+
+        circle_marker_6a3ae38bdf91def8d36385d82610ba4b.bindPopup(popup_59b1966acb17ff94f8a02b8ce5ebc412)
+        ;
+
+        
+    
+    
+            circle_marker_6a3ae38bdf91def8d36385d82610ba4b.bindTooltip(
+                `<div>
+                     BERGSPRÄNGARENS FÖRSKOLA: 39,14 % inom 100 m
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_1fa7d4ed142c30148c5002d909c460cd = L.circleMarker(
+                [65.587502, 22.246112],
+                {"bubblingMouseEvents": true, "color": "#404040", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#31a354", "fillOpacity": 0.92, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_2d7b6c31042a2d07da3263cdc5e360f9);
+        
+    
+        var popup_d1ce809e6649d569e9ce57eea3e9686f = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_eeb6a40a9766f87e865abb988aeb7c53 = $(`<div id="html_eeb6a40a9766f87e865abb988aeb7c53" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; line-height: 1.45; min-width: 250px;">             <div style="font-weight: 700; margin-bottom: 4px;">DUNGENS FÖRSKOLA</div>             <div>LÅNGMYRVÄGEN 2</div>             <div>97455 LULEÅ</div>             <div style="margin: 8px 0 4px; font-weight: 700;">Trädtäckning</div>             <div>25 m: 0,0 %</div>             <div>50 m: 21,72 %</div>             <div>100 m: 36,77 %</div>             <div style="margin-top: 6px;">Index 25/50/100: 13,87</div>         </div>         </div>`)[0];
+                popup_d1ce809e6649d569e9ce57eea3e9686f.setContent(html_eeb6a40a9766f87e865abb988aeb7c53);
+            
+        
+
+        circle_marker_1fa7d4ed142c30148c5002d909c460cd.bindPopup(popup_d1ce809e6649d569e9ce57eea3e9686f)
+        ;
+
+        
+    
+    
+            circle_marker_1fa7d4ed142c30148c5002d909c460cd.bindTooltip(
+                `<div>
+                     DUNGENS FÖRSKOLA: 36,77 % inom 100 m
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_6f5d26a83e3f07730d0cd3a82328cc8d = L.circleMarker(
+                [65.576482, 22.210042],
+                {"bubblingMouseEvents": true, "color": "#404040", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#31a354", "fillOpacity": 0.92, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_2d7b6c31042a2d07da3263cdc5e360f9);
+        
+    
+        var popup_1cbfcdc286c5d07e2e46e6f58ae7164e = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_ce6a01506d85e19687ecc869004878de = $(`<div id="html_ce6a01506d85e19687ecc869004878de" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; line-height: 1.45; min-width: 250px;">             <div style="font-weight: 700; margin-bottom: 4px;">ÅRANS FÖRSKOLA</div>             <div>EDEFORSGATAN 61</div>             <div>97439 LULEÅ</div>             <div style="margin: 8px 0 4px; font-weight: 700;">Trädtäckning</div>             <div>25 m: 34,65 %</div>             <div>50 m: 41,42 %</div>             <div>100 m: 36,41 %</div>             <div style="margin-top: 6px;">Index 25/50/100: 37,03</div>         </div>         </div>`)[0];
+                popup_1cbfcdc286c5d07e2e46e6f58ae7164e.setContent(html_ce6a01506d85e19687ecc869004878de);
+            
+        
+
+        circle_marker_6f5d26a83e3f07730d0cd3a82328cc8d.bindPopup(popup_1cbfcdc286c5d07e2e46e6f58ae7164e)
+        ;
+
+        
+    
+    
+            circle_marker_6f5d26a83e3f07730d0cd3a82328cc8d.bindTooltip(
+                `<div>
+                     ÅRANS FÖRSKOLA: 36,41 % inom 100 m
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_36be71f454b0ee50d12b04155542973d = L.circleMarker(
+                [65.587236, 22.207129],
+                {"bubblingMouseEvents": true, "color": "#404040", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#74c476", "fillOpacity": 0.92, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_2d7b6c31042a2d07da3263cdc5e360f9);
+        
+    
+        var popup_9538314e7abe960be00104c9088d770c = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_7c2d025a989084d18099a971e430711a = $(`<div id="html_7c2d025a989084d18099a971e430711a" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; line-height: 1.45; min-width: 250px;">             <div style="font-weight: 700; margin-bottom: 4px;">HAGA FÖRSKOLA</div>             <div>KOLKGATAN 34</div>             <div>97441 LULEÅ</div>             <div style="margin: 8px 0 4px; font-weight: 700;">Trädtäckning</div>             <div>25 m: 25,2 %</div>             <div>50 m: 41,67 %</div>             <div>100 m: 34,5 %</div>             <div style="margin-top: 6px;">Index 25/50/100: 32,0</div>         </div>         </div>`)[0];
+                popup_9538314e7abe960be00104c9088d770c.setContent(html_7c2d025a989084d18099a971e430711a);
+            
+        
+
+        circle_marker_36be71f454b0ee50d12b04155542973d.bindPopup(popup_9538314e7abe960be00104c9088d770c)
+        ;
+
+        
+    
+    
+            circle_marker_36be71f454b0ee50d12b04155542973d.bindTooltip(
+                `<div>
+                     HAGA FÖRSKOLA: 34,5 % inom 100 m
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_75b03d054553cecb2ddb6a2d2ca6130b = L.circleMarker(
+                [65.587983, 22.228895],
+                {"bubblingMouseEvents": true, "color": "#404040", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#74c476", "fillOpacity": 0.92, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_2d7b6c31042a2d07da3263cdc5e360f9);
+        
+    
+        var popup_70e9dacc18aae9b3df85712619b397ef = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_313eed4d53d0217e0dd82f56eb1aaf83 = $(`<div id="html_313eed4d53d0217e0dd82f56eb1aaf83" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; line-height: 1.45; min-width: 250px;">             <div style="font-weight: 700; margin-bottom: 4px;">SNÖMANNENS FÖRSKOLA</div>             <div>MIDVINTERSTIGEN 6</div>             <div>97451 LULEÅ</div>             <div style="margin: 8px 0 4px; font-weight: 700;">Trädtäckning</div>             <div>25 m: 2,03 %</div>             <div>50 m: 26,24 %</div>             <div>100 m: 31,02 %</div>             <div style="margin-top: 6px;">Index 25/50/100: 15,09</div>         </div>         </div>`)[0];
+                popup_70e9dacc18aae9b3df85712619b397ef.setContent(html_313eed4d53d0217e0dd82f56eb1aaf83);
+            
+        
+
+        circle_marker_75b03d054553cecb2ddb6a2d2ca6130b.bindPopup(popup_70e9dacc18aae9b3df85712619b397ef)
+        ;
+
+        
+    
+    
+            circle_marker_75b03d054553cecb2ddb6a2d2ca6130b.bindTooltip(
+                `<div>
+                     SNÖMANNENS FÖRSKOLA: 31,02 % inom 100 m
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_a491afee0db8b9bdafee82b65796132a = L.circleMarker(
+                [65.620388, 22.176233],
+                {"bubblingMouseEvents": true, "color": "#404040", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#74c476", "fillOpacity": 0.92, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_2d7b6c31042a2d07da3263cdc5e360f9);
+        
+    
+        var popup_6d5c9c9d89054cd9bd75af9b5e999abe = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_26752a85ebf30196ba803ea1aa9aa157 = $(`<div id="html_26752a85ebf30196ba803ea1aa9aa157" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; line-height: 1.45; min-width: 250px;">             <div style="font-weight: 700; margin-bottom: 4px;">VINTERGATANS FÖRSKOLA</div>             <div>STORMVÄGEN 1</div>             <div>97634 LULEÅ</div>             <div style="margin: 8px 0 4px; font-weight: 700;">Trädtäckning</div>             <div>25 m: 12,96 %</div>             <div>50 m: 22,27 %</div>             <div>100 m: 30,07 %</div>             <div style="margin-top: 6px;">Index 25/50/100: 19,18</div>         </div>         </div>`)[0];
+                popup_6d5c9c9d89054cd9bd75af9b5e999abe.setContent(html_26752a85ebf30196ba803ea1aa9aa157);
+            
+        
+
+        circle_marker_a491afee0db8b9bdafee82b65796132a.bindPopup(popup_6d5c9c9d89054cd9bd75af9b5e999abe)
+        ;
+
+        
+    
+    
+            circle_marker_a491afee0db8b9bdafee82b65796132a.bindTooltip(
+                `<div>
+                     VINTERGATANS FÖRSKOLA: 30,07 % inom 100 m
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_9f87cfab67a6064ec5cb40a343728f16 = L.circleMarker(
+                [65.611434, 22.180948],
+                {"bubblingMouseEvents": true, "color": "#404040", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#74c476", "fillOpacity": 0.92, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_2d7b6c31042a2d07da3263cdc5e360f9);
+        
+    
+        var popup_4cf6dd169ffebeff980310d504520ac3 = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_4a4578f4b7c332d3da51670d882a4b09 = $(`<div id="html_4a4578f4b7c332d3da51670d882a4b09" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; line-height: 1.45; min-width: 250px;">             <div style="font-weight: 700; margin-bottom: 4px;">ORMBERGETS FÖRSKOLA</div>             <div>HÖSTVÄGEN 1</div>             <div>97633 LULEÅ</div>             <div style="margin: 8px 0 4px; font-weight: 700;">Trädtäckning</div>             <div>25 m: 0,97 %</div>             <div>50 m: 28,21 %</div>             <div>100 m: 29,86 %</div>             <div style="margin-top: 6px;">Index 25/50/100: 14,92</div>         </div>         </div>`)[0];
+                popup_4cf6dd169ffebeff980310d504520ac3.setContent(html_4a4578f4b7c332d3da51670d882a4b09);
+            
+        
+
+        circle_marker_9f87cfab67a6064ec5cb40a343728f16.bindPopup(popup_4cf6dd169ffebeff980310d504520ac3)
+        ;
+
+        
+    
+    
+            circle_marker_9f87cfab67a6064ec5cb40a343728f16.bindTooltip(
+                `<div>
+                     ORMBERGETS FÖRSKOLA: 29,86 % inom 100 m
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_2b891956cb5582a91fdc6e14a3963bd1 = L.circleMarker(
+                [65.624838, 22.14488],
+                {"bubblingMouseEvents": true, "color": "#404040", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#74c476", "fillOpacity": 0.92, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_2d7b6c31042a2d07da3263cdc5e360f9);
+        
+    
+        var popup_20c0ee6a3e0cad544aa822e68ecbaddb = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_5ff59ac80d1396d39cc432eb7ae58461 = $(`<div id="html_5ff59ac80d1396d39cc432eb7ae58461" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; line-height: 1.45; min-width: 250px;">             <div style="font-weight: 700; margin-bottom: 4px;">SUNDETS FÖRSKOLA</div>             <div>ASSISTENTVÄGEN 1</div>             <div>97752 LULEÅ</div>             <div style="margin: 8px 0 4px; font-weight: 700;">Trädtäckning</div>             <div>25 m: 0,36 %</div>             <div>50 m: 19,94 %</div>             <div>100 m: 29,84 %</div>             <div style="margin-top: 6px;">Index 25/50/100: 12,13</div>         </div>         </div>`)[0];
+                popup_20c0ee6a3e0cad544aa822e68ecbaddb.setContent(html_5ff59ac80d1396d39cc432eb7ae58461);
+            
+        
+
+        circle_marker_2b891956cb5582a91fdc6e14a3963bd1.bindPopup(popup_20c0ee6a3e0cad544aa822e68ecbaddb)
+        ;
+
+        
+    
+    
+            circle_marker_2b891956cb5582a91fdc6e14a3963bd1.bindTooltip(
+                `<div>
+                     SUNDETS FÖRSKOLA: 29,84 % inom 100 m
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_3923a1aabdb8434d9a48a26892f5bf1b = L.circleMarker(
+                [65.588678, 22.1589],
+                {"bubblingMouseEvents": true, "color": "#404040", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#74c476", "fillOpacity": 0.92, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_2d7b6c31042a2d07da3263cdc5e360f9);
+        
+    
+        var popup_eb562853dbd2ffbdff213dff9590bff7 = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_62364860cfbe27bd0c49a92917e42feb = $(`<div id="html_62364860cfbe27bd0c49a92917e42feb" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; line-height: 1.45; min-width: 250px;">             <div style="font-weight: 700; margin-bottom: 4px;">CHARLOTTENDALS FÖRSKOLA</div>             <div>VÄSTRA MALMGATAN 8 A</div>             <div>97241 LULEÅ</div>             <div style="margin: 8px 0 4px; font-weight: 700;">Trädtäckning</div>             <div>25 m: 17,78 %</div>             <div>50 m: 36,3 %</div>             <div>100 m: 29,61 %</div>             <div style="margin-top: 6px;">Index 25/50/100: 25,7</div>         </div>         </div>`)[0];
+                popup_eb562853dbd2ffbdff213dff9590bff7.setContent(html_62364860cfbe27bd0c49a92917e42feb);
+            
+        
+
+        circle_marker_3923a1aabdb8434d9a48a26892f5bf1b.bindPopup(popup_eb562853dbd2ffbdff213dff9590bff7)
+        ;
+
+        
+    
+    
+            circle_marker_3923a1aabdb8434d9a48a26892f5bf1b.bindTooltip(
+                `<div>
+                     CHARLOTTENDALS FÖRSKOLA: 29,61 % inom 100 m
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_55ae1c831bfa1e088e948e27a10b9c1e = L.circleMarker(
+                [65.580729, 22.261325],
+                {"bubblingMouseEvents": true, "color": "#404040", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#74c476", "fillOpacity": 0.92, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_2d7b6c31042a2d07da3263cdc5e360f9);
+        
+    
+        var popup_6988f7b6cfa6a1b60b5cf69a6d5f71d1 = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_d682841786d60e1aa6a30d3cd78b3467 = $(`<div id="html_d682841786d60e1aa6a30d3cd78b3467" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; line-height: 1.45; min-width: 250px;">             <div style="font-weight: 700; margin-bottom: 4px;">ÄNGENS FÖRSKOLA</div>             <div>KRÅKÖRVÄGEN 4</div>             <div>97455 LULEÅ</div>             <div style="margin: 8px 0 4px; font-weight: 700;">Trädtäckning</div>             <div>25 m: 4,12 %</div>             <div>50 m: 27,25 %</div>             <div>100 m: 28,25 %</div>             <div style="margin-top: 6px;">Index 25/50/100: 15,88</div>         </div>         </div>`)[0];
+                popup_6988f7b6cfa6a1b60b5cf69a6d5f71d1.setContent(html_d682841786d60e1aa6a30d3cd78b3467);
+            
+        
+
+        circle_marker_55ae1c831bfa1e088e948e27a10b9c1e.bindPopup(popup_6988f7b6cfa6a1b60b5cf69a6d5f71d1)
+        ;
+
+        
+    
+    
+            circle_marker_55ae1c831bfa1e088e948e27a10b9c1e.bindTooltip(
+                `<div>
+                     ÄNGENS FÖRSKOLA: 28,25 % inom 100 m
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_4e629c802d9980ce1a987668287820ad = L.circleMarker(
+                [65.599633, 22.128393],
+                {"bubblingMouseEvents": true, "color": "#404040", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#74c476", "fillOpacity": 0.92, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_2d7b6c31042a2d07da3263cdc5e360f9);
+        
+    
+        var popup_2e947774858634b582f541466c005009 = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_7d5134da8208d63b735edcf2b0b4761e = $(`<div id="html_7d5134da8208d63b735edcf2b0b4761e" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; line-height: 1.45; min-width: 250px;">             <div style="font-weight: 700; margin-bottom: 4px;">MUNKEBERG ANNEX FÖRSKOLA</div>             <div>ANKARVÄGEN 1 C</div>             <div>97341 LULEÅ</div>             <div style="margin: 8px 0 4px; font-weight: 700;">Trädtäckning</div>             <div>25 m: 20,07 %</div>             <div>50 m: 43,08 %</div>             <div>100 m: 27,68 %</div>             <div style="margin-top: 6px;">Index 25/50/100: 28,5</div>         </div>         </div>`)[0];
+                popup_2e947774858634b582f541466c005009.setContent(html_7d5134da8208d63b735edcf2b0b4761e);
+            
+        
+
+        circle_marker_4e629c802d9980ce1a987668287820ad.bindPopup(popup_2e947774858634b582f541466c005009)
+        ;
+
+        
+    
+    
+            circle_marker_4e629c802d9980ce1a987668287820ad.bindTooltip(
+                `<div>
+                     MUNKEBERG ANNEX FÖRSKOLA: 27,68 % inom 100 m
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_caee38d0b0750648c29c7dc2945c5295 = L.circleMarker(
+                [65.59899, 22.128456],
+                {"bubblingMouseEvents": true, "color": "#404040", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#74c476", "fillOpacity": 0.92, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_2d7b6c31042a2d07da3263cdc5e360f9);
+        
+    
+        var popup_49e4f194392127772a0287f3471c25e5 = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_6aca769f49c1d1affc95d18c490dae84 = $(`<div id="html_6aca769f49c1d1affc95d18c490dae84" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; line-height: 1.45; min-width: 250px;">             <div style="font-weight: 700; margin-bottom: 4px;">MUNKEBERGS FÖRSKOLA</div>             <div>ANKARVÄGEN 1 A</div>             <div>97341 LULEÅ</div>             <div style="margin: 8px 0 4px; font-weight: 700;">Trädtäckning</div>             <div>25 m: 4,52 %</div>             <div>50 m: 13,82 %</div>             <div>100 m: 27,23 %</div>             <div style="margin-top: 6px;">Index 25/50/100: 11,85</div>         </div>         </div>`)[0];
+                popup_49e4f194392127772a0287f3471c25e5.setContent(html_6aca769f49c1d1affc95d18c490dae84);
+            
+        
+
+        circle_marker_caee38d0b0750648c29c7dc2945c5295.bindPopup(popup_49e4f194392127772a0287f3471c25e5)
+        ;
+
+        
+    
+    
+            circle_marker_caee38d0b0750648c29c7dc2945c5295.bindTooltip(
+                `<div>
+                     MUNKEBERGS FÖRSKOLA: 27,23 % inom 100 m
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_1a86497a1236955d6e71eadffa185de2 = L.circleMarker(
+                [65.616841, 22.180289],
+                {"bubblingMouseEvents": true, "color": "#404040", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#74c476", "fillOpacity": 0.92, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_2d7b6c31042a2d07da3263cdc5e360f9);
+        
+    
+        var popup_a380192f646d1aa486d6cd085aad4f5e = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_8c90bf89c38399fa1c66fbfaa0fce990 = $(`<div id="html_8c90bf89c38399fa1c66fbfaa0fce990" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; line-height: 1.45; min-width: 250px;">             <div style="font-weight: 700; margin-bottom: 4px;">BRISENS FÖRSKOLA</div>             <div>BLIDVÄGEN 26</div>             <div>97632 LULEÅ</div>             <div style="margin: 8px 0 4px; font-weight: 700;">Trädtäckning</div>             <div>25 m: 7,32 %</div>             <div>50 m: 26,72 %</div>             <div>100 m: 27,06 %</div>             <div style="margin-top: 6px;">Index 25/50/100: 17,09</div>         </div>         </div>`)[0];
+                popup_a380192f646d1aa486d6cd085aad4f5e.setContent(html_8c90bf89c38399fa1c66fbfaa0fce990);
+            
+        
+
+        circle_marker_1a86497a1236955d6e71eadffa185de2.bindPopup(popup_a380192f646d1aa486d6cd085aad4f5e)
+        ;
+
+        
+    
+    
+            circle_marker_1a86497a1236955d6e71eadffa185de2.bindTooltip(
+                `<div>
+                     BRISENS FÖRSKOLA: 27,06 % inom 100 m
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_afa20dc954de2b578bbf3586b4982c78 = L.circleMarker(
+                [65.585393, 22.200187],
+                {"bubblingMouseEvents": true, "color": "#404040", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#74c476", "fillOpacity": 0.92, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_2d7b6c31042a2d07da3263cdc5e360f9);
+        
+    
+        var popup_a6013ef0e73300ade485f26d2537c73f = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_66d53c20261c28e4203675d5bd52276c = $(`<div id="html_66d53c20261c28e4203675d5bd52276c" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; line-height: 1.45; min-width: 250px;">             <div style="font-weight: 700; margin-bottom: 4px;">BERGETS FÖRSKOLA</div>             <div>ÖSTERGATAN 18 D</div>             <div>97434 LULEÅ</div>             <div style="margin: 8px 0 4px; font-weight: 700;">Trädtäckning</div>             <div>25 m: 2,74 %</div>             <div>50 m: 27,33 %</div>             <div>100 m: 26,88 %</div>             <div style="margin-top: 6px;">Index 25/50/100: 14,95</div>         </div>         </div>`)[0];
+                popup_a6013ef0e73300ade485f26d2537c73f.setContent(html_66d53c20261c28e4203675d5bd52276c);
+            
+        
+
+        circle_marker_afa20dc954de2b578bbf3586b4982c78.bindPopup(popup_a6013ef0e73300ade485f26d2537c73f)
+        ;
+
+        
+    
+    
+            circle_marker_afa20dc954de2b578bbf3586b4982c78.bindTooltip(
+                `<div>
+                     BERGETS FÖRSKOLA: 26,88 % inom 100 m
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_d5dfde24a50bad85921618a971190f8a = L.circleMarker(
+                [65.594902, 22.162889],
+                {"bubblingMouseEvents": true, "color": "#404040", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#74c476", "fillOpacity": 0.92, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_2d7b6c31042a2d07da3263cdc5e360f9);
+        
+    
+        var popup_d8e1cf1d7367c91ab6b310ebb2b66566 = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_142c1152478d4caf365421a961a756a6 = $(`<div id="html_142c1152478d4caf365421a961a756a6" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; line-height: 1.45; min-width: 250px;">             <div style="font-weight: 700; margin-bottom: 4px;">MIDSKOGSSKOLAN OCH MIDSKOGENS FÖRSKOLA</div>             <div>GYMNASIEVÄGEN 2 C</div>             <div>97332 LULEÅ</div>             <div style="margin: 8px 0 4px; font-weight: 700;">Trädtäckning</div>             <div>25 m: 12,04 %</div>             <div>50 m: 22,52 %</div>             <div>100 m: 25,92 %</div>             <div style="margin-top: 6px;">Index 25/50/100: 17,96</div>         </div>         </div>`)[0];
+                popup_d8e1cf1d7367c91ab6b310ebb2b66566.setContent(html_142c1152478d4caf365421a961a756a6);
+            
+        
+
+        circle_marker_d5dfde24a50bad85921618a971190f8a.bindPopup(popup_d8e1cf1d7367c91ab6b310ebb2b66566)
+        ;
+
+        
+    
+    
+            circle_marker_d5dfde24a50bad85921618a971190f8a.bindTooltip(
+                `<div>
+                     MIDSKOGSSKOLAN OCH MIDSKOGENS FÖRSKOLA: 25,92 % inom 100 m
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_07c41684bcd37f1bf8fe740204e29e09 = L.circleMarker(
+                [65.589577, 22.168871],
+                {"bubblingMouseEvents": true, "color": "#404040", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#74c476", "fillOpacity": 0.92, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_2d7b6c31042a2d07da3263cdc5e360f9);
+        
+    
+        var popup_7ffd899b9fc41e70bbfd10f264cecca4 = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_dea89c4a1858d42c2c6fa2c1f0ba1305 = $(`<div id="html_dea89c4a1858d42c2c6fa2c1f0ba1305" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; line-height: 1.45; min-width: 250px;">             <div style="font-weight: 700; margin-bottom: 4px;">SEMINARIETS FÖRSKOLA</div>             <div>REKTORSGATAN 2</div>             <div>97242 LULEÅ</div>             <div style="margin: 8px 0 4px; font-weight: 700;">Trädtäckning</div>             <div>25 m: 6,0 %</div>             <div>50 m: 9,02 %</div>             <div>100 m: 25,75 %</div>             <div style="margin-top: 6px;">Index 25/50/100: 10,86</div>         </div>         </div>`)[0];
+                popup_7ffd899b9fc41e70bbfd10f264cecca4.setContent(html_dea89c4a1858d42c2c6fa2c1f0ba1305);
+            
+        
+
+        circle_marker_07c41684bcd37f1bf8fe740204e29e09.bindPopup(popup_7ffd899b9fc41e70bbfd10f264cecca4)
+        ;
+
+        
+    
+    
+            circle_marker_07c41684bcd37f1bf8fe740204e29e09.bindTooltip(
+                `<div>
+                     SEMINARIETS FÖRSKOLA: 25,75 % inom 100 m
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_e0cd98eb3e6cefe60808c4e531ea1b41 = L.circleMarker(
+                [65.601008, 22.163074],
+                {"bubblingMouseEvents": true, "color": "#404040", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#bae4b3", "fillOpacity": 0.92, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_2d7b6c31042a2d07da3263cdc5e360f9);
+        
+    
+        var popup_d6784211beb38fb236f68681945dbaed = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_a33c4d6c7ddc05a906649cbd2add8221 = $(`<div id="html_a33c4d6c7ddc05a906649cbd2add8221" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; line-height: 1.45; min-width: 250px;">             <div style="font-weight: 700; margin-bottom: 4px;">VILLA KREATIVA FÖRSKOLA</div>             <div>KANOTVÄGEN 2-4</div>             <div>97332 LULEÅ</div>             <div style="margin: 8px 0 4px; font-weight: 700;">Trädtäckning</div>             <div>25 m: 2,08 %</div>             <div>50 m: 11,87 %</div>             <div>100 m: 17,55 %</div>             <div style="margin-top: 6px;">Index 25/50/100: 8,11</div>         </div>         </div>`)[0];
+                popup_d6784211beb38fb236f68681945dbaed.setContent(html_a33c4d6c7ddc05a906649cbd2add8221);
+            
+        
+
+        circle_marker_e0cd98eb3e6cefe60808c4e531ea1b41.bindPopup(popup_d6784211beb38fb236f68681945dbaed)
+        ;
+
+        
+    
+    
+            circle_marker_e0cd98eb3e6cefe60808c4e531ea1b41.bindTooltip(
+                `<div>
+                     VILLA KREATIVA FÖRSKOLA: 17,55 % inom 100 m
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_ad72de53579504b39ec67bfc44284cf4 = L.circleMarker(
+                [65.561281, 22.19458],
+                {"bubblingMouseEvents": true, "color": "#404040", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#bae4b3", "fillOpacity": 0.92, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_2d7b6c31042a2d07da3263cdc5e360f9);
+        
+    
+        var popup_0ef8f4381516f7337d37a9798a3425b5 = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_38798c214181d968867331e7d9d1393a = $(`<div id="html_38798c214181d968867331e7d9d1393a" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; line-height: 1.45; min-width: 250px;">             <div style="font-weight: 700; margin-bottom: 4px;">SVARTÖSTADENS FÖRSKOLA</div>             <div>ÖSTMARKSGATAN 8-10</div>             <div>97437 LULEÅ</div>             <div style="margin: 8px 0 4px; font-weight: 700;">Trädtäckning</div>             <div>25 m: 4,17 %</div>             <div>50 m: 19,96 %</div>             <div>100 m: 16,5 %</div>             <div style="margin-top: 6px;">Index 25/50/100: 11,37</div>         </div>         </div>`)[0];
+                popup_0ef8f4381516f7337d37a9798a3425b5.setContent(html_38798c214181d968867331e7d9d1393a);
+            
+        
+
+        circle_marker_ad72de53579504b39ec67bfc44284cf4.bindPopup(popup_0ef8f4381516f7337d37a9798a3425b5)
+        ;
+
+        
+    
+    
+            circle_marker_ad72de53579504b39ec67bfc44284cf4.bindTooltip(
+                `<div>
+                     SVARTÖSTADENS FÖRSKOLA: 16,5 % inom 100 m
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_939807747ade9882041a9fe3944f9817 = L.circleMarker(
+                [65.59375, 22.195338],
+                {"bubblingMouseEvents": true, "color": "#404040", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#bae4b3", "fillOpacity": 0.92, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_2d7b6c31042a2d07da3263cdc5e360f9);
+        
+    
+        var popup_02199c59aaa0e488b672c0b96e398cd3 = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_a554c8243416c404da9abeb9cff31605 = $(`<div id="html_a554c8243416c404da9abeb9cff31605" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; line-height: 1.45; min-width: 250px;">             <div style="font-weight: 700; margin-bottom: 4px;">TALLKRONANSKOLAN OCH SPIRA FÖRSKOLA</div>             <div>REGEMENTSVÄGEN 1 A</div>             <div>97442 LULEÅ</div>             <div style="margin: 8px 0 4px; font-weight: 700;">Trädtäckning</div>             <div>25 m: 6,4 %</div>             <div>50 m: 7,51 %</div>             <div>100 m: 15,57 %</div>             <div style="margin-top: 6px;">Index 25/50/100: 8,57</div>         </div>         </div>`)[0];
+                popup_02199c59aaa0e488b672c0b96e398cd3.setContent(html_a554c8243416c404da9abeb9cff31605);
+            
+        
+
+        circle_marker_939807747ade9882041a9fe3944f9817.bindPopup(popup_02199c59aaa0e488b672c0b96e398cd3)
+        ;
+
+        
+    
+    
+            circle_marker_939807747ade9882041a9fe3944f9817.bindTooltip(
+                `<div>
+                     TALLKRONANSKOLAN OCH SPIRA FÖRSKOLA: 15,57 % inom 100 m
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_f0b622df2a004736ded05b0f86398cc0 = L.circleMarker(
+                [65.620535, 22.147575],
+                {"bubblingMouseEvents": true, "color": "#404040", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#bae4b3", "fillOpacity": 0.92, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_2d7b6c31042a2d07da3263cdc5e360f9);
+        
+    
+        var popup_3e08e73246ce5b62463c0c44fd77eb34 = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_b38505e12818046bd7ac33c881bcfed7 = $(`<div id="html_b38505e12818046bd7ac33c881bcfed7" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; line-height: 1.45; min-width: 250px;">             <div style="font-weight: 700; margin-bottom: 4px;">STRANDENS FÖRSKOLA</div>             <div>DOCENTVÄGEN 8</div>             <div>97752 LULEÅ</div>             <div style="margin: 8px 0 4px; font-weight: 700;">Trädtäckning</div>             <div>25 m: 7,11 %</div>             <div>50 m: 10,88 %</div>             <div>100 m: 14,6 %</div>             <div style="margin-top: 6px;">Index 25/50/100: 9,74</div>         </div>         </div>`)[0];
+                popup_3e08e73246ce5b62463c0c44fd77eb34.setContent(html_b38505e12818046bd7ac33c881bcfed7);
+            
+        
+
+        circle_marker_f0b622df2a004736ded05b0f86398cc0.bindPopup(popup_3e08e73246ce5b62463c0c44fd77eb34)
+        ;
+
+        
+    
+    
+            circle_marker_f0b622df2a004736ded05b0f86398cc0.bindTooltip(
+                `<div>
+                     STRANDENS FÖRSKOLA: 14,6 % inom 100 m
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_73766585f538133632df68143fdf22e0 = L.circleMarker(
+                [65.607055, 22.101538],
+                {"bubblingMouseEvents": true, "color": "#404040", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#bae4b3", "fillOpacity": 0.92, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_2d7b6c31042a2d07da3263cdc5e360f9);
+        
+    
+        var popup_04405271e0c69aa7b64fd41502a3807b = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_e35a9f6663e638f6ed7c1e9c1a72eba8 = $(`<div id="html_e35a9f6663e638f6ed7c1e9c1a72eba8" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; line-height: 1.45; min-width: 250px;">             <div style="font-weight: 700; margin-bottom: 4px;">KRISTALLENS FÖRSKOLA</div>             <div>TUNASTIGEN 63</div>             <div>97344 LULEÅ</div>             <div style="margin: 8px 0 4px; font-weight: 700;">Trädtäckning</div>             <div>25 m: 0,0 %</div>             <div>50 m: 3,69 %</div>             <div>100 m: 13,67 %</div>             <div style="margin-top: 6px;">Index 25/50/100: 3,84</div>         </div>         </div>`)[0];
+                popup_04405271e0c69aa7b64fd41502a3807b.setContent(html_e35a9f6663e638f6ed7c1e9c1a72eba8);
+            
+        
+
+        circle_marker_73766585f538133632df68143fdf22e0.bindPopup(popup_04405271e0c69aa7b64fd41502a3807b)
+        ;
+
+        
+    
+    
+            circle_marker_73766585f538133632df68143fdf22e0.bindTooltip(
+                `<div>
+                     KRISTALLENS FÖRSKOLA: 13,67 % inom 100 m
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_0e504ef0507584312a4ed57a9934f5f5 = L.circleMarker(
+                [65.601197, 22.154491],
+                {"bubblingMouseEvents": true, "color": "#404040", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#bae4b3", "fillOpacity": 0.92, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_2d7b6c31042a2d07da3263cdc5e360f9);
+        
+    
+        var popup_2d6d9a28c11d4cd2a956da01f6491188 = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_4f320bc4945a7995f1f352d56c7c9990 = $(`<div id="html_4f320bc4945a7995f1f352d56c7c9990" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; line-height: 1.45; min-width: 250px;">             <div style="font-weight: 700; margin-bottom: 4px;">KALLKÄLLANS FÖRSKOLA</div>             <div>LINGONSTIGEN 36</div>             <div>97332 LULEÅ</div>             <div style="margin: 8px 0 4px; font-weight: 700;">Trädtäckning</div>             <div>25 m: 4,12 %</div>             <div>50 m: 14,15 %</div>             <div>100 m: 12,82 %</div>             <div style="margin-top: 6px;">Index 25/50/100: 8,87</div>         </div>         </div>`)[0];
+                popup_2d6d9a28c11d4cd2a956da01f6491188.setContent(html_4f320bc4945a7995f1f352d56c7c9990);
+            
+        
+
+        circle_marker_0e504ef0507584312a4ed57a9934f5f5.bindPopup(popup_2d6d9a28c11d4cd2a956da01f6491188)
+        ;
+
+        
+    
+    
+            circle_marker_0e504ef0507584312a4ed57a9934f5f5.bindTooltip(
+                `<div>
+                     KALLKÄLLANS FÖRSKOLA: 12,82 % inom 100 m
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_d1503b8644986cfa452bc359ef8b67f6 = L.circleMarker(
+                [65.586403, 22.18654],
+                {"bubblingMouseEvents": true, "color": "#404040", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#bae4b3", "fillOpacity": 0.92, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_2d7b6c31042a2d07da3263cdc5e360f9);
+        
+    
+        var popup_d451058352ab4d0d43673726c610a763 = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_96b55857eae23598d821462715bb2372 = $(`<div id="html_96b55857eae23598d821462715bb2372" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; line-height: 1.45; min-width: 250px;">             <div style="font-weight: 700; margin-bottom: 4px;">BURSTRÖMSKAS FÖRSKOLA</div>             <div>BURSTRÖMSVÄGEN 10</div>             <div>97433 LULEÅ</div>             <div style="margin: 8px 0 4px; font-weight: 700;">Trädtäckning</div>             <div>25 m: 19,0 %</div>             <div>50 m: 19,43 %</div>             <div>100 m: 12,71 %</div>             <div style="margin-top: 6px;">Index 25/50/100: 17,87</div>         </div>         </div>`)[0];
+                popup_d451058352ab4d0d43673726c610a763.setContent(html_96b55857eae23598d821462715bb2372);
+            
+        
+
+        circle_marker_d1503b8644986cfa452bc359ef8b67f6.bindPopup(popup_d451058352ab4d0d43673726c610a763)
+        ;
+
+        
+    
+    
+            circle_marker_d1503b8644986cfa452bc359ef8b67f6.bindTooltip(
+                `<div>
+                     BURSTRÖMSKAS FÖRSKOLA: 12,71 % inom 100 m
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_6fd30a757c655a4b4d23ff7357e71174 = L.circleMarker(
+                [65.58759, 22.169127],
+                {"bubblingMouseEvents": true, "color": "#404040", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#bae4b3", "fillOpacity": 0.92, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_2d7b6c31042a2d07da3263cdc5e360f9);
+        
+    
+        var popup_df01182b30194fe79d3751e14e865c75 = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_b626c2dd584a8e29c6084cd06e688568 = $(`<div id="html_b626c2dd584a8e29c6084cd06e688568" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; line-height: 1.45; min-width: 250px;">             <div style="font-weight: 700; margin-bottom: 4px;">SOLKATTENS FÖRSKOLA</div>             <div>SUNDSBACKEN 15</div>             <div>97242 LULEÅ</div>             <div style="margin: 8px 0 4px; font-weight: 700;">Trädtäckning</div>             <div>25 m: 2,64 %</div>             <div>50 m: 10,75 %</div>             <div>100 m: 11,51 %</div>             <div style="margin-top: 6px;">Index 25/50/100: 6,85</div>         </div>         </div>`)[0];
+                popup_df01182b30194fe79d3751e14e865c75.setContent(html_b626c2dd584a8e29c6084cd06e688568);
+            
+        
+
+        circle_marker_6fd30a757c655a4b4d23ff7357e71174.bindPopup(popup_df01182b30194fe79d3751e14e865c75)
+        ;
+
+        
+    
+    
+            circle_marker_6fd30a757c655a4b4d23ff7357e71174.bindTooltip(
+                `<div>
+                     SOLKATTENS FÖRSKOLA: 11,51 % inom 100 m
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_136be7092ee070e33dc0f89a09747774 = L.circleMarker(
+                [65.578305, 22.140238],
+                {"bubblingMouseEvents": true, "color": "#404040", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#bae4b3", "fillOpacity": 0.92, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_2d7b6c31042a2d07da3263cdc5e360f9);
+        
+    
+        var popup_0bd70ee971a07673711b463e2a300b04 = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_70d8e1b4864ffc5ac05b0eaf9e688c7d = $(`<div id="html_70d8e1b4864ffc5ac05b0eaf9e688c7d" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; line-height: 1.45; min-width: 250px;">             <div style="font-weight: 700; margin-bottom: 4px;">HÄGERNS FÖRSKOLA</div>             <div>RESIDENSGATAN 2</div>             <div>97236 LULEÅ</div>             <div style="margin: 8px 0 4px; font-weight: 700;">Trädtäckning</div>             <div>25 m: 0,56 %</div>             <div>50 m: 5,07 %</div>             <div>100 m: 11,33 %</div>             <div style="margin-top: 6px;">Index 25/50/100: 4,07</div>         </div>         </div>`)[0];
+                popup_0bd70ee971a07673711b463e2a300b04.setContent(html_70d8e1b4864ffc5ac05b0eaf9e688c7d);
+            
+        
+
+        circle_marker_136be7092ee070e33dc0f89a09747774.bindPopup(popup_0bd70ee971a07673711b463e2a300b04)
+        ;
+
+        
+    
+    
+            circle_marker_136be7092ee070e33dc0f89a09747774.bindTooltip(
+                `<div>
+                     HÄGERNS FÖRSKOLA: 11,33 % inom 100 m
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_ef6197e317f3ac0b29874d9820418a18 = L.circleMarker(
+                [65.615924, 22.155269],
+                {"bubblingMouseEvents": true, "color": "#404040", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#bae4b3", "fillOpacity": 0.92, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_2d7b6c31042a2d07da3263cdc5e360f9);
+        
+    
+        var popup_8857d8dbbdcbebd977a94318dde03b09 = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_c35b57d39a5700b6cd69ae629a52e1ee = $(`<div id="html_c35b57d39a5700b6cd69ae629a52e1ee" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; line-height: 1.45; min-width: 250px;">             <div style="font-weight: 700; margin-bottom: 4px;">UDDENS FÖRSKOLA</div>             <div>FORSKARVÄGEN 153</div>             <div>97753 LULEÅ</div>             <div style="margin: 8px 0 4px; font-weight: 700;">Trädtäckning</div>             <div>25 m: 9,71 %</div>             <div>50 m: 10,26 %</div>             <div>100 m: 10,44 %</div>             <div style="margin-top: 6px;">Index 25/50/100: 10,02</div>         </div>         </div>`)[0];
+                popup_8857d8dbbdcbebd977a94318dde03b09.setContent(html_c35b57d39a5700b6cd69ae629a52e1ee);
+            
+        
+
+        circle_marker_ef6197e317f3ac0b29874d9820418a18.bindPopup(popup_8857d8dbbdcbebd977a94318dde03b09)
+        ;
+
+        
+    
+    
+            circle_marker_ef6197e317f3ac0b29874d9820418a18.bindTooltip(
+                `<div>
+                     UDDENS FÖRSKOLA: 10,44 % inom 100 m
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_75717dbc23700ec7a2c9d2f704fe73c8 = L.circleMarker(
+                [65.584778, 22.252695],
+                {"bubblingMouseEvents": true, "color": "#404040", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#edf8e9", "fillOpacity": 0.92, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_2d7b6c31042a2d07da3263cdc5e360f9);
+        
+    
+        var popup_45405e1cb233b80f0e6d8ea6f7ec2746 = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_a795e6e6c6bf85f2001c62742cfab42e = $(`<div id="html_a795e6e6c6bf85f2001c62742cfab42e" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; line-height: 1.45; min-width: 250px;">             <div style="font-weight: 700; margin-bottom: 4px;">KULLENS FÖRSKOLA</div>             <div>RÄVSPÅRET 1</div>             <div>97455 LULEÅ</div>             <div style="margin: 8px 0 4px; font-weight: 700;">Trädtäckning</div>             <div>25 m: 6,66 %</div>             <div>50 m: 4,69 %</div>             <div>100 m: 8,48 %</div>             <div style="margin-top: 6px;">Index 25/50/100: 6,43</div>         </div>         </div>`)[0];
+                popup_45405e1cb233b80f0e6d8ea6f7ec2746.setContent(html_a795e6e6c6bf85f2001c62742cfab42e);
+            
+        
+
+        circle_marker_75717dbc23700ec7a2c9d2f704fe73c8.bindPopup(popup_45405e1cb233b80f0e6d8ea6f7ec2746)
+        ;
+
+        
+    
+    
+            circle_marker_75717dbc23700ec7a2c9d2f704fe73c8.bindTooltip(
+                `<div>
+                     KULLENS FÖRSKOLA: 8,48 % inom 100 m
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_b891e78503ab502d85c30045deb28bcc = L.circleMarker(
+                [65.608916, 22.097621],
+                {"bubblingMouseEvents": true, "color": "#404040", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#edf8e9", "fillOpacity": 0.92, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_2d7b6c31042a2d07da3263cdc5e360f9);
+        
+    
+        var popup_ca39c4536bf29cce1ab337c1db45fefc = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_8e4ca43ed0fa8640cf187371a42c061f = $(`<div id="html_8e4ca43ed0fa8640cf187371a42c061f" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; line-height: 1.45; min-width: 250px;">             <div style="font-weight: 700; margin-bottom: 4px;">BORGMÄSTARSKOLAN MED FÖRSKOLOR</div>             <div>FRAMNÄSGATAN 4</div>             <div>97342 LULEÅ</div>             <div style="margin: 8px 0 4px; font-weight: 700;">Trädtäckning</div>             <div>25 m: 0,15 %</div>             <div>50 m: 0,32 %</div>             <div>100 m: 7,81 %</div>             <div style="margin-top: 6px;">Index 25/50/100: 1,73</div>         </div>         </div>`)[0];
+                popup_ca39c4536bf29cce1ab337c1db45fefc.setContent(html_8e4ca43ed0fa8640cf187371a42c061f);
+            
+        
+
+        circle_marker_b891e78503ab502d85c30045deb28bcc.bindPopup(popup_ca39c4536bf29cce1ab337c1db45fefc)
+        ;
+
+        
+    
+    
+            circle_marker_b891e78503ab502d85c30045deb28bcc.bindTooltip(
+                `<div>
+                     BORGMÄSTARSKOLAN MED FÖRSKOLOR: 7,81 % inom 100 m
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_ca3356fc9f796182d751f54205fa7964 = L.circleMarker(
+                [65.616905, 22.144041],
+                {"bubblingMouseEvents": true, "color": "#404040", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#edf8e9", "fillOpacity": 0.92, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_2d7b6c31042a2d07da3263cdc5e360f9);
+        
+    
+        var popup_7cae27af4a890090638f88beb9270921 = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_fb87e6cdd15336f3f8c5edd070b38d92 = $(`<div id="html_fb87e6cdd15336f3f8c5edd070b38d92" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; line-height: 1.45; min-width: 250px;">             <div style="font-weight: 700; margin-bottom: 4px;">Kideus AB</div>             <div>UNIVERSITETSVÄGEN 10 A</div>             <div>97441 LULEÅ</div>             <div style="margin: 8px 0 4px; font-weight: 700;">Trädtäckning</div>             <div>25 m: 1,27 %</div>             <div>50 m: 13,98 %</div>             <div>100 m: 7,69 %</div>             <div style="margin-top: 6px;">Index 25/50/100: 6,37</div>         </div>         </div>`)[0];
+                popup_7cae27af4a890090638f88beb9270921.setContent(html_fb87e6cdd15336f3f8c5edd070b38d92);
+            
+        
+
+        circle_marker_ca3356fc9f796182d751f54205fa7964.bindPopup(popup_7cae27af4a890090638f88beb9270921)
+        ;
+
+        
+    
+    
+            circle_marker_ca3356fc9f796182d751f54205fa7964.bindTooltip(
+                `<div>
+                     Kideus AB: 7,69 % inom 100 m
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_802345e1d36e69b1ef6f96e9ba7929de = L.circleMarker(
+                [65.572847, 22.104101],
+                {"bubblingMouseEvents": true, "color": "#404040", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#edf8e9", "fillOpacity": 0.92, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_2d7b6c31042a2d07da3263cdc5e360f9);
+        
+    
+        var popup_d51438bf171880db61f82ef357af36bb = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_97735bcccaa565c009dafb014dc9a6a8 = $(`<div id="html_97735bcccaa565c009dafb014dc9a6a8" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; line-height: 1.45; min-width: 250px;">             <div style="font-weight: 700; margin-bottom: 4px;">BERGSTADENS FÖRSKOLA</div>             <div>STENGATAN 139</div>             <div>97252 LULEÅ</div>             <div style="margin: 8px 0 4px; font-weight: 700;">Trädtäckning</div>             <div>25 m: 0,0 %</div>             <div>50 m: 0,0 %</div>             <div>100 m: 0,0 %</div>             <div style="margin-top: 6px;">Index 25/50/100: 0,0</div>         </div>         </div>`)[0];
+                popup_d51438bf171880db61f82ef357af36bb.setContent(html_97735bcccaa565c009dafb014dc9a6a8);
+            
+        
+
+        circle_marker_802345e1d36e69b1ef6f96e9ba7929de.bindPopup(popup_d51438bf171880db61f82ef357af36bb)
+        ;
+
+        
+    
+    
+            circle_marker_802345e1d36e69b1ef6f96e9ba7929de.bindTooltip(
+                `<div>
+                     BERGSTADENS FÖRSKOLA: 0,0 % inom 100 m
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_592f832bef01c2cebf673c08d4a1fe38 = L.circleMarker(
+                [65.575775, 22.098586],
+                {"bubblingMouseEvents": true, "color": "#404040", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#edf8e9", "fillOpacity": 0.92, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_2d7b6c31042a2d07da3263cdc5e360f9);
+        
+    
+        var popup_dbc505ddd1ea887d00db329998316670 = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_7ca2f6e842b23cdc4f65e9c9257bb8fa = $(`<div id="html_7ca2f6e842b23cdc4f65e9c9257bb8fa" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; line-height: 1.45; min-width: 250px;">             <div style="font-weight: 700; margin-bottom: 4px;">KLIPPANS FÖRSKOLA</div>             <div>STENGATAN 15</div>             <div>97252 LULEÅ</div>             <div style="margin: 8px 0 4px; font-weight: 700;">Trädtäckning</div>             <div>25 m: 0,0 %</div>             <div>50 m: 0,0 %</div>             <div>100 m: 0,0 %</div>             <div style="margin-top: 6px;">Index 25/50/100: 0,0</div>         </div>         </div>`)[0];
+                popup_dbc505ddd1ea887d00db329998316670.setContent(html_7ca2f6e842b23cdc4f65e9c9257bb8fa);
+            
+        
+
+        circle_marker_592f832bef01c2cebf673c08d4a1fe38.bindPopup(popup_dbc505ddd1ea887d00db329998316670)
+        ;
+
+        
+    
+    
+            circle_marker_592f832bef01c2cebf673c08d4a1fe38.bindTooltip(
+                `<div>
+                     KLIPPANS FÖRSKOLA: 0,0 % inom 100 m
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_010a40ea1ed59d0e4d7819fe043e8ad6 = L.circleMarker(
+                [65.571936, 22.102958],
+                {"bubblingMouseEvents": true, "color": "#404040", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#edf8e9", "fillOpacity": 0.92, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_2d7b6c31042a2d07da3263cdc5e360f9);
+        
+    
+        var popup_ea80df0a2fe74a66167e0d0cc15cc48d = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_ed99e92fb8815ae45ff2015894969bd9 = $(`<div id="html_ed99e92fb8815ae45ff2015894969bd9" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; line-height: 1.45; min-width: 250px;">             <div style="font-weight: 700; margin-bottom: 4px;">STENÅSENS FÖRSKOLA</div>             <div>STENGATAN 20</div>             <div>97252 LULEÅ</div>             <div style="margin: 8px 0 4px; font-weight: 700;">Trädtäckning</div>             <div>25 m: 0,0 %</div>             <div>50 m: 0,0 %</div>             <div>100 m: 0,0 %</div>             <div style="margin-top: 6px;">Index 25/50/100: 0,0</div>         </div>         </div>`)[0];
+                popup_ea80df0a2fe74a66167e0d0cc15cc48d.setContent(html_ed99e92fb8815ae45ff2015894969bd9);
+            
+        
+
+        circle_marker_010a40ea1ed59d0e4d7819fe043e8ad6.bindPopup(popup_ea80df0a2fe74a66167e0d0cc15cc48d)
+        ;
+
+        
+    
+    
+            circle_marker_010a40ea1ed59d0e4d7819fe043e8ad6.bindTooltip(
+                `<div>
+                     STENÅSENS FÖRSKOLA: 0,0 % inom 100 m
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_9779bb5ab2e4a604a317b75c8475255f = L.circleMarker(
+                [65.569683, 22.121528],
+                {"bubblingMouseEvents": true, "color": "#404040", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#edf8e9", "fillOpacity": 0.92, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_2d7b6c31042a2d07da3263cdc5e360f9);
+        
+    
+        var popup_6cbc6a69ccece7d615f88e33038a09f7 = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_f1a294425ca943be29a9dba6d6789ad3 = $(`<div id="html_f1a294425ca943be29a9dba6d6789ad3" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; line-height: 1.45; min-width: 250px;">             <div style="font-weight: 700; margin-bottom: 4px;">Trollnäs förskola ek. för.</div>             <div>BOWATERSVÄGEN 7</div>             <div>97251 LULEÅ</div>             <div style="margin: 8px 0 4px; font-weight: 700;">Trädtäckning</div>             <div>25 m: 0,0 %</div>             <div>50 m: 0,0 %</div>             <div>100 m: 0,0 %</div>             <div style="margin-top: 6px;">Index 25/50/100: 0,0</div>         </div>         </div>`)[0];
+                popup_6cbc6a69ccece7d615f88e33038a09f7.setContent(html_f1a294425ca943be29a9dba6d6789ad3);
+            
+        
+
+        circle_marker_9779bb5ab2e4a604a317b75c8475255f.bindPopup(popup_6cbc6a69ccece7d615f88e33038a09f7)
+        ;
+
+        
+    
+    
+            circle_marker_9779bb5ab2e4a604a317b75c8475255f.bindTooltip(
+                `<div>
+                     Trollnäs förskola ek. för.: 0,0 % inom 100 m
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_7ad75dcf0d04767be83c16948b7bb96c = L.circleMarker(
+                [65.57653, 22.079405],
+                {"bubblingMouseEvents": true, "color": "#404040", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#edf8e9", "fillOpacity": 0.92, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_2d7b6c31042a2d07da3263cdc5e360f9);
+        
+    
+        var popup_34c59807c19e77ab3c43ceb156466b4d = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_4a71c0db9d06aa4b4521e2a2e4f9194a = $(`<div id="html_4a71c0db9d06aa4b4521e2a2e4f9194a" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; line-height: 1.45; min-width: 250px;">             <div style="font-weight: 700; margin-bottom: 4px;">VÅGENS förskola Ekonomisk förening</div>             <div>UPPLAGSVÄGEN 18</div>             <div>97254 LULEÅ</div>             <div style="margin: 8px 0 4px; font-weight: 700;">Trädtäckning</div>             <div>25 m: 0,0 %</div>             <div>50 m: 0,0 %</div>             <div>100 m: 0,0 %</div>             <div style="margin-top: 6px;">Index 25/50/100: 0,0</div>         </div>         </div>`)[0];
+                popup_34c59807c19e77ab3c43ceb156466b4d.setContent(html_4a71c0db9d06aa4b4521e2a2e4f9194a);
+            
+        
+
+        circle_marker_7ad75dcf0d04767be83c16948b7bb96c.bindPopup(popup_34c59807c19e77ab3c43ceb156466b4d)
+        ;
+
+        
+    
+    
+            circle_marker_7ad75dcf0d04767be83c16948b7bb96c.bindTooltip(
+                `<div>
+                     VÅGENS förskola Ekonomisk förening: 0,0 % inom 100 m
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_8da8a2119a1a90c4591a34ee5c075dca = L.circleMarker(
+                [65.57653, 22.079405],
+                {"bubblingMouseEvents": true, "color": "#404040", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#edf8e9", "fillOpacity": 0.92, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 1.5}
+            ).addTo(feature_group_2d7b6c31042a2d07da3263cdc5e360f9);
+        
+    
+        var popup_716fc6d54ce68c20f6b2dd41ed47c421 = L.popup({
+  "maxWidth": 320,
+});
+
+        
+            
+                var html_ee9a21d116c77bee3bdc8989e63ed351 = $(`<div id="html_ee9a21d116c77bee3bdc8989e63ed351" style="width: 100.0%; height: 100.0%;">         <div style="font-family: Arial, sans-serif; font-size: 13px; line-height: 1.45; min-width: 250px;">             <div style="font-weight: 700; margin-bottom: 4px;">Vågens Förskola AB</div>             <div>UPPLAGSVÄGEN 18</div>             <div>97254 LULEÅ</div>             <div style="margin: 8px 0 4px; font-weight: 700;">Trädtäckning</div>             <div>25 m: 0,0 %</div>             <div>50 m: 0,0 %</div>             <div>100 m: 0,0 %</div>             <div style="margin-top: 6px;">Index 25/50/100: 0,0</div>         </div>         </div>`)[0];
+                popup_716fc6d54ce68c20f6b2dd41ed47c421.setContent(html_ee9a21d116c77bee3bdc8989e63ed351);
+            
+        
+
+        circle_marker_8da8a2119a1a90c4591a34ee5c075dca.bindPopup(popup_716fc6d54ce68c20f6b2dd41ed47c421)
+        ;
+
+        
+    
+    
+            circle_marker_8da8a2119a1a90c4591a34ee5c075dca.bindTooltip(
+                `<div>
+                     Vågens Förskola AB: 0,0 % inom 100 m
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            feature_group_2d7b6c31042a2d07da3263cdc5e360f9.addTo(map_2bfe5a14219e2134933f9f84ba95a95f);
+        
+    
+            var layer_control_5c15397f818f6c161aed7e59f1cb66d8_layers = {
+                base_layers : {
+                    "Bakgrund" : tile_layer_fcb2f44c27fb76fbe8e99a9000e0934b,
+                },
+                overlays :  {
+                    "Tr\u00e4dt\u00e4ckning \u003e 3 m" : image_overlay_7b4410310ea6066a19889a099ae5c355,
+                    "F\u00f6rskolor (f\u00e4rg = tr\u00e4dt\u00e4ckning inom 100 m)" : feature_group_2d7b6c31042a2d07da3263cdc5e360f9,
+                },
+            };
+            let layer_control_5c15397f818f6c161aed7e59f1cb66d8 = L.control.layers(
+                layer_control_5c15397f818f6c161aed7e59f1cb66d8_layers.base_layers,
+                layer_control_5c15397f818f6c161aed7e59f1cb66d8_layers.overlays,
+                {
+  "position": "topright",
+  "collapsed": false,
+  "autoZIndex": true,
+}
+            ).addTo(map_2bfe5a14219e2134933f9f84ba95a95f);
+
+        
+    
+            map_2bfe5a14219e2134933f9f84ba95a95f.fitBounds(
+                [[65.54370333238597, 22.054966339128114], [65.63207342433049, 22.326459087987217]],
+                {}
+            );
+        
+</script>
+</html>
