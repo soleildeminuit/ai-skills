@@ -1,0 +1,9 @@
+numpy
+pandas
+fiona
+rasterio
+pyproj
+shapely
+folium
+Pillow
+gdown
