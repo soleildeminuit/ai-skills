@@ -191,8 +191,8 @@ import folium
 # ==============================================================================
 
 # Indatafiler
-TREE_RASTER_PATH = Path("tradtackning_binar3m_Norrbottens_2580TC115_Luleå.tif")
-PRESCHOOL_GPKG_PATH = Path("Förskolor_2025_sweref.gpkg")
+TREE_RASTER_PATH = Path("data/raw/tradtackning_binar3m_Norrbottens_2580TC115_Luleå.tif")
+PRESCHOOL_GPKG_PATH = Path("data/raw/Förskolor_2025_sweref.gpkg")
 
 # Lagernamn i geopackage. Om None används första lagret.
 PRESCHOOL_LAYER_NAME = "Förskolor_2025_sweref"
