@@ -201,7 +201,7 @@ PRESCHOOL_LAYER_NAME = "Förskolor_2025_sweref"
 BUFFER_DISTANCES_M = [25, 50, 100]
 
 # Utdatakatalog
-OUTPUT_DIR = Path("output_tradtackning_forskolor")
+OUTPUT_DIR = Path("outputs/tradtackning")
 
 # Utdatafiler
 OUTPUT_CSV = OUTPUT_DIR / "forskolor_lulea_tradtackning_25_50_100m.csv"
